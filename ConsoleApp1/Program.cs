@@ -58,6 +58,16 @@ namespace ConsoleApp1
             var abc = "abczft";
             Console.WriteLine(abc.Count());
             var i = input[0][1];
+            var state = new bool[3];
+            state[0] = false;
+            state[1] = false;
+            for(int j = 0; j < 3; j++)
+            {
+                if(state[j] != false)
+                {
+                    Console.WriteLine("pass");
+                }
+            }
         }
     }
 }
