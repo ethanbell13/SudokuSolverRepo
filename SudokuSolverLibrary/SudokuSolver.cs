@@ -21,14 +21,58 @@ namespace SudokuSolverLibrary
                 }
             }
         }
+        static void AddNum (char num, int row, int col)
+        {
+            organizedBoard[row][col] = num;
+            organizedBoard[col][row[ = num;
+            if(row <= 2)
+            {
+                if(col <= 2)
+                    block = 18;
+                else if(col <= 5)
+                    block = 19;
+                else
+                    block = 20;
+            }
+            else if(row <= 5)
+            {
+                if(col <= 2)
+                    block = 21
+                else if(col <= 5)
+                    block = 22
+                else
+                    block = 23
+            }
+            else
+            {
+                if(col <= 2)
+                    block = 24
+                else if(col <= 5)
+                    block = 25
+                else
+                    block = 26
+            }
+            
+        }
         static void RowFiller(char[][] organizedBoard)
         {
             for(int i = 0; i < 9; i++)
             {
-
+                var num = 45;
+                var count = 0;
                 for(int j = 0; j < 9; j++)
                 {
-
+                    if(organizeBoard[i][j] != ' ')
+                    {
+                        count += 1;
+                        num -= ToInt32(organizedBoard[i][j]);
+                    }    
+                    else if(count == 8)
+                    {    
+                        organizedBoard[i][j] = num;
+                        organizedBoard[j + 9][i] = num;
+                        
+                    }  
                 }
             }
         }
