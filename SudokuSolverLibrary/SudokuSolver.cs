@@ -2,13 +2,14 @@
 using System.Linq;
 namespace SudokuSolverLibrary
 {
-    public static class SudokuSolver
+    public class SudokuSolver
     {
-        public static void sudokusolversolution(char[][] board)
+        char[][] board;
+        char[][] sudokuArrays;
+        public void sudokusolversolution(char[][] sudokuBoard)
         {
-            if (board.GetLength(0) != 9 || board.GetLength(1) != 9)
-                throw new Exception("Must be a 9 x 9 array.");
-            //create more exception blocks
+            SudokuLibrary.SudokuValidater.SudoukuValidatorSolution(sudokuBoard);
+            sudokuArrays = SudokuLibrary.BoardOrganizer.BoardOrganizerSolution(sudokuBoard);
             var solved = false;
             while(solved == false)
             {
@@ -21,10 +22,19 @@ namespace SudokuSolverLibrary
                 }
             }
         }
-        static void AddNum (char num, int row, int col)
+        void AddNum (char num, int arrayNum, int position)
         {
-            organizedBoard[row][col] = num;
-            organizedBoard[col][row[ = num;
+            sudokuArrays[arrayNum][position] = num;
+            if (arrayNum < 18)
+            {
+                if(arrayNum < 9) 
+                {
+                    sudokuArrays[arrayNum + position][arrayNum] = num;
+                }
+            }
+
+            var block = 0;
+            var arrayPosition = 0;
             if(row <= 2)
             {
                 if(col <= 2)
@@ -36,43 +46,51 @@ namespace SudokuSolverLibrary
             }
             else if(row <= 5)
             {
-                if(col <= 2)
-                    block = 21
-                else if(col <= 5)
-                    block = 22
+                if (col <= 2)
+                    block = 21;
+                else if (col <= 5)
+                    block = 22;
                 else
-                    block = 23
+                    block = 23;
             }
             else
             {
-                if(col <= 2)
-                    block = 24
-                else if(col <= 5)
-                    block = 25
+                if (col <= 2)
+                    block = 24;
+                else if (col <= 5)
+                    block = 25;
                 else
-                    block = 26
+                    block = 26;
             }
-            
+            if ((row + 1) % 3 == 0)
+                position = 6;
+            else if ((row + 1) == 2)
+                position = 3;
+            if ((col + 1) % 3 == 0)
+                position += 2;
+            else if ((col + 1) % 3 == 2)
+                position += 1;
+            sudokuArrays[block][position] = num;
         }
-        static void RowFiller(char[][] organizedBoard)
+        void ArrayFiller(int arrayNum)
         {
-            for(int i = 0; i < 9; i++)
+            var sudokuArray = sudokuArrays[arrayNum];
+            var num = 45;
+            var count = 0;
+            foreach(char c in sudokuArray)
             {
-                var num = 45;
-                var count = 0;
-                for(int j = 0; j < 9; j++)
+                if (c != ' ')
+                    count ++;
+                    num -= Convert.ToInt32(c);
+            }
+            if(count == 8)
+            {
+                for(int i = 0; i < 9; i++)
                 {
-                    if(organizeBoard[i][j] != ' ')
+                    if(sudokuArray[i] == ' ')
                     {
-                        count += 1;
-                        num -= ToInt32(organizedBoard[i][j]);
-                    }    
-                    else if(count == 8)
-                    {    
-                        organizedBoard[i][j] = num;
-                        organizedBoard[j + 9][i] = num;
-                        
-                    }  
+                        AddNum(Convert.ToChar(num), arrayNum, i);
+                    }
                 }
             }
         }
