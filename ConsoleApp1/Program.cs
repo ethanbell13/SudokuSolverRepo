@@ -68,6 +68,14 @@ namespace ConsoleApp1
                     Console.WriteLine("pass");
                 }
             }
+            var testDic = new Dictionary<int, int[]>();
+            testDic.Add(32, new int[6] { 3, 5, 13, 3, 22, 2 });
+            var test = testDic[32];
+            foreach(int j in test)
+            {
+                Console.WriteLine(j);
+            }
+
         }
     }
 }

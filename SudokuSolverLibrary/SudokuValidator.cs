@@ -8,7 +8,7 @@ namespace SudokuLibrary
 {
     public static class SudokuValidater
     {
-        static bool ArgumentValidator(char[][] board)
+        public static void ArgumentValidator(char[][] board)
         {
             if(board.GetLength(0) != 9)
                 throw new ArgumentException("Input must be jagged array of 27 character arrays with lengths of 9.");
@@ -26,12 +26,10 @@ namespace SudokuLibrary
                         throw new ArgumentException("Each array element must be a number between 1-9 or ' '.");
                 }
             }
-            return true;
         }
 
         public static void SudoukuValidatorSolution(char[][] board)
         {
-            ArgumentValidator(board);
             var sudokuArrays = BoardOrganizer.BoardOrganizerSolution(board);
             foreach(char[] array in sudokuArrays)
             {

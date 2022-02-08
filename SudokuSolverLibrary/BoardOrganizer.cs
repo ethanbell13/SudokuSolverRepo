@@ -12,7 +12,7 @@ namespace SudokuLibrary
         //Columns = Arrays 9-17, and Squares = Arrays 18-26.
         public static char[][] BoardOrganizerSolution(char[][] board)
         {
-
+            SudokuLibrary.SudokuValidater.ArgumentValidator(board);
             var sudokuArrays = new char[27][];
             for (int i = 0; i < 9; i++)
                 sudokuArrays[i] = board[i];
@@ -43,6 +43,15 @@ namespace SudokuLibrary
                 }
             }
             return sudokuArrays;
+        }
+        public static Dictionary<int, Tuple<Tuple<int, int>, Tuple<int, int>>> PositionMatcher(char[][] board)
+        {
+            var positionPair = new Dictionary<int, Tuple<Tuple<int, int>, Tuple<int, int>>>
+            {
+                
+            };
+            
+            return positionPair;
         }
     }
 }

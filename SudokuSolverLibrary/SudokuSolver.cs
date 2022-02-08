@@ -32,45 +32,6 @@ namespace SudokuSolverLibrary
                     sudokuArrays[arrayNum + position][arrayNum] = num;
                 }
             }
-
-            var block = 0;
-            var arrayPosition = 0;
-            if(row <= 2)
-            {
-                if(col <= 2)
-                    block = 18;
-                else if(col <= 5)
-                    block = 19;
-                else
-                    block = 20;
-            }
-            else if(row <= 5)
-            {
-                if (col <= 2)
-                    block = 21;
-                else if (col <= 5)
-                    block = 22;
-                else
-                    block = 23;
-            }
-            else
-            {
-                if (col <= 2)
-                    block = 24;
-                else if (col <= 5)
-                    block = 25;
-                else
-                    block = 26;
-            }
-            if ((row + 1) % 3 == 0)
-                position = 6;
-            else if ((row + 1) == 2)
-                position = 3;
-            if ((col + 1) % 3 == 0)
-                position += 2;
-            else if ((col + 1) % 3 == 2)
-                position += 1;
-            sudokuArrays[block][position] = num;
         }
         void ArrayFiller(int arrayNum)
         {
