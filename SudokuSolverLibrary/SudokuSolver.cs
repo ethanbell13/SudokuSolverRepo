@@ -9,7 +9,9 @@ namespace SudokuSolverLibrary
         public void sudokusolversolution(char[][] sudokuBoard)
         {
             SudokuLibrary.SudokuValidater.SudoukuValidatorSolution(sudokuBoard);
-            sudokuArrays = SudokuLibrary.BoardOrganizer.BoardOrganizerSolution(sudokuBoard);
+            var sudokuTuple = SudokuLibrary.BoardOrganizer.BoardOrganizerSolution(sudokuBoard)
+            sudokuArrays = sudokuTuple[0];
+            arrayLinker = sudokuTuple[1];
             var solved = false;
             while(solved == false)
             {
@@ -24,14 +26,10 @@ namespace SudokuSolverLibrary
         }
         void AddNum (char num, int arrayNum, int position)
         {
+            var corArrays = arrayLinker[{arrayNum, position}];
             sudokuArrays[arrayNum][position] = num;
-            if (arrayNum < 18)
-            {
-                if(arrayNum < 9) 
-                {
-                    sudokuArrays[arrayNum + position][arrayNum] = num;
-                }
-            }
+            sudokuArrays[corArrays[0]][corArrays[1]] = num;
+            sudokuArrays[corArrays[2]][corArrays[3]] = num;
         }
         void ArrayFiller(int arrayNum)
         {
