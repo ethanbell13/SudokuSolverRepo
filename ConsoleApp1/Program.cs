@@ -23,5 +23,8 @@ namespace ConsoleApp1
             };
             SudokuLibrary.BoardOrganizer.BoardOrganizerSolution(input);
             var y = 2;
+            Console.WriteLine(y);
+    
+        }
     }
 }
