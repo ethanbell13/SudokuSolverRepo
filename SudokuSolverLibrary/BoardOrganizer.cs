@@ -13,12 +13,12 @@ namespace SudokuLibrary
         public static (char[][], Dictionary<int[], int[]>) BoardOrganizerSolution(char[][] board)
         {
             SudokuLibrary.SudokuValidater.ArgumentValidator(board);
-            \\arraylinker Key is position of a character in sudokuArrays and the values are the two other corresponding
-            \\array positions. ie. If you give it the position of the character in a row,
-            \\it tells you the character's positions in the corresponding column and box.
+            //arraylinker Key is position of a character in sudokuArrays and the values are the two other corresponding
+            //array positions. ie. If you give it the position of the character in a row,
+            //it tells you the character's positions in the corresponding column and box.
             var arrayLinker = new Dictionary<int[], int[]>();
             var sudokuArrays = new char[27][];
-            int blockNum;
+            int blockNum = 0;
             int blockPos;
             //Add array connectons to dictionary as you add units to sudokuArrays
             for (int i = 0; i < 9; i++)
@@ -26,23 +26,23 @@ namespace SudokuLibrary
                 sudokuArrays[i] = new char[9];
                 for (int j = 0; j < 9; j++)
                 {
-                    if(i < 1)
+                    blockNum = 18 + (i / 3) * 3 + j / 3;
+                    blockPos = (i % 3) * 3 + j % 3;
+                    if (i == 0)
                         sudokuArrays[j + 9] = new char[9];
                     if(i % 3 == 0 && j % 3 == 0)
                     {
-                        blockNum = 18 + (i / 3) * 3 + j / 3;
                         sudokuArrays[blockNum] = new char[9];
                     }
-                    blockPos = (i % 3) * 3 + j % 3;
                     sudokuArrays[i][j] = board[i][j];
                     sudokuArrays[j + 9][i] = board[i][j];
-                    sudokuArray[blockNum][blockPos] = board[i][j];
-                    arrayLinker.Add({i, j}, {j + 9, i, blockNum, blockPos});
-                    arrayLinker.Add({j + 9, i}, {i, j, blockNum, blockPos});
-                    arrayLinker.Add({blockNum, blockPos}, {i, j, j + 9, i});
+                    sudokuArrays[blockNum][blockPos] = board[i][j];
+                    arrayLinker.Add(new int[2] {i, j}, new int[4] { j + 9, i, blockNum, blockPos });
+                    arrayLinker.Add(new int[2] {j + 9, i}, new int[4] {i, j, blockNum, blockPos});
+                    arrayLinker.Add(new int[2] {blockNum, blockPos}, new int[4] {i, j, j + 9, i});
                 }
             }
-            return (suodkuArrays, arrayLinker);
+            return (sudokuArrays, arrayLinker);
         }
     }
 }

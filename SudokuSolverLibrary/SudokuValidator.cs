@@ -30,7 +30,7 @@ namespace SudokuLibrary
 
         public static void SudoukuValidatorSolution(char[][] board)
         {
-            var sudokuArrays = BoardOrganizer.BoardOrganizerSolution(board);
+            var sudokuArrays = BoardOrganizer.BoardOrganizerSolution(board).Item1;
             foreach(char[] array in sudokuArrays)
             {
                 var currentArray = new char[9];

@@ -21,7 +21,7 @@ namespace ConsoleApp1
                 new char[9] {' ', ' ', ' ', '4', '1', '9', ' ', ' ', '5' },
                 new char[9] {' ', ' ', ' ', ' ', '8', ' ', ' ', '7', '9' } 
             };
-            SudokuLibrary.BoardOrganizer.BoardOrganizerSolution(input);
+            var x = SudokuLibrary.BoardOrganizer.BoardOrganizerSolution(input);
             var y = 2;
             Console.WriteLine(y);
     

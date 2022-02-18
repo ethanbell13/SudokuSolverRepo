@@ -55,7 +55,7 @@ namespace SudokuTestLibrary
                 new char[9] {' ', ' ', ' ', '4', '1', '9', ' ', '8', ' ' },
                 new char[9] {'2', '8', ' ', ' ', ' ', '5', ' ', '7', '9' }
             };
-            var result = SudokuLibrary.BoardOrganizer.BoardOrganizerSolution(input);
+            var result = SudokuLibrary.BoardOrganizer.BoardOrganizerSolution(input).Item1;
             var test = true;
             for(int i = 0; i < 27; i++)
             {
