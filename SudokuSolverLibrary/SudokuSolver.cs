@@ -1,35 +1,35 @@
 ﻿using System;
 using System.Linq;
-namespace SudokuSolverLibrary
+using System.Collections.Generic;
+namespace SudokuLibrary
 {
     public class SudokuSolver
     {
-        char[][] board;
         char[][] sudokuArrays;
+        Dictionary<string, int[]> arrayLinker;
+        int blankCount;
+        int[][] blankSpots;
+        Dictionary<string, char[]> notes;
         public void sudokusolversolution(char[][] sudokuBoard)
         {
-            SudokuLibrary.SudokuValidater.SudoukuValidatorSolution(sudokuBoard);
-            var sudokuTuple = SudokuLibrary.BoardOrganizer.BoardOrganizerSolution(sudokuBoard);
+            SudokuValidater.SudoukuValidatorSolution(sudokuBoard);
+            var sudokuTuple = BoardOrganizer.BoardOrganizerSolution(sudokuBoard);
             sudokuArrays = sudokuTuple.Item1;
-            var arrayLinker = sudokuTuple.Item2;
-            var solved = false;
-            while(solved == false)
-            {
-             for(int i = 0; i < 9; i++)
+            arrayLinker = sudokuTuple.Item2;
+            blankCount = sudokuTuple.Item3;
+            blankSpots = sudokuTuple.Item4;
+            notesInit();
+             for(int i = 0; i < 27; i++)
                 {
-                    for(int j = 0; j < 9; j++)
-                    {
-
-                    }
+                    ArrayFiller(i);
                 }
-            }
         }
-        void AddNum (char num, int arrayNum, int position)
+        void AddNum (char num, int arrayNum, int pos)
         {
-            //var corArrays = arrayLinker[{arrayNum, position}];
-            sudokuArrays[arrayNum][position] = num;
-            //sudokuArrays[corArrays[0]][corArrays[1]] = num;
-            //sudokuArrays[corArrays[2]][corArrays[3]] = num;
+            var copositions = arrayLinker[arrayNum.ToString() + pos.ToString()];
+            sudokuArrays[arrayNum][pos] = num;
+            sudokuArrays[copositions[0]][copositions[1]] = num;
+            sudokuArrays[copositions[2]][copositions[3]] = num;
         }
         void ArrayFiller(int arrayNum)
         {
@@ -39,8 +39,10 @@ namespace SudokuSolverLibrary
             foreach(char c in sudokuArray)
             {
                 if (c != ' ')
-                    count ++;
-                    num -= Convert.ToInt32(c);
+                {
+                    count++;
+                    num -= c - '0';
+                }
             }
             if(count == 8)
             {
@@ -48,97 +50,84 @@ namespace SudokuSolverLibrary
                 {
                     if(sudokuArray[i] == ' ')
                     {
-                        AddNum(Convert.ToChar(num), arrayNum, i);
+                        AddNum(Convert.ToChar(num + '0'), arrayNum, i);
+                        break;
                     }
                 }
             }
         }
-        //uncomplete. Try swapping the boxes out for columns. Functionally, there shouldn't be a difference, and it would make
-        //keeping tack of locating and editing much easier
-        static void IdentificationByNumbers(char[][] organizedBoard)
+        void notesInit()
         {
-            for(int i = 1; i <= 9; i++)
+            notes = new Dictionary<string, char[]>();
+            var solved = 0;
+            for (int i = 0; i < blankCount; i++)
             {
-                var num = char.Parse(i.ToString());
-                for (int j = 0; j <= 9; j++)
+                var rowNum = blankSpots[i][0];
+                var colNum = blankSpots[i][1];
+                var blockNum = arrayLinker[rowNum.ToString() + colNum.ToString()][2];
+                var note = new char[9];
+                var noteCount = 0;
+                var num = 45;
+                for (int j = 0; j < 1; j++)
                 {
-                    if(!organizedBoard[17 + j].Contains(num))
+                    foreach (char c in sudokuArrays[i])
                     {
-                        var block = organizedBoard[17 + j];
-                        var canBeNum = new bool[9] { true, true, true, true, true, true, true, true, true };
-                        var numLocation = 99;
-                        for(int k = 0; k < 9; k++)
+                        if (c != ' ')
                         {
-                            if (block[k] != ' ')
+                            note[noteCount] = c;
+                            num -= c - '0';
+                            noteCount++;
+                            if (noteCount == 8)
                             {
-                                canBeNum[k] = false;
+                                AddNum(Convert.ToChar(num + '0'), rowNum, colNum);
+                                solved++;
+                                break;
                             }
                         }
-                        if (organizedBoard[0].Contains(num))
-                        {
-                            canBeNum[0] = false;
-                            canBeNum[1] = false;
-                            canBeNum[2] = false;
-
-                        }
-                        if (organizedBoard[1].Contains(num))
-                        {
-                            canBeNum[3] = false;
-                            canBeNum[4] = false;
-                            canBeNum[5] = false;
-                        }
-                        if (organizedBoard[2].Contains(num))
-                        {
-                            canBeNum[6] = false;
-                            canBeNum[7] = false;
-                            canBeNum[8] = false;
-                        }
-                        if (organizedBoard[9].Contains(num))
-                        {
-                            canBeNum[0] = false;
-                            canBeNum[3] = false;
-                            canBeNum[6] = false;
-                        }
-                        if (organizedBoard[10].Contains(num))
-                        {
-                            canBeNum[1] = false;
-                            canBeNum[4] = false;
-                            canBeNum[7] = false;
-                        }
-                        if (organizedBoard[11].Contains(num))
-                        {
-                            canBeNum[2] = false;
-                            canBeNum[5] = false;
-                            canBeNum[8] = false;
-                        }
-                        for(int l = 0; l < 9; l++)
-                        {
-                            if(canBeNum[l] == true)
-                            {
-                                if (numLocation == 99)
-                                    numLocation = l;
-                                else
-                                {
-                                    numLocation = 99;
-                                    break;
-                                }
-                            }
-                        }
-                        if(numLocation != 99)
-                        {
-                            if(j < 3)
-                            {
-
-                            }
-                        }
-
-
                     }
-
-
+                    foreach (char c in sudokuArrays[colNum + 9])
+                    {
+                        if (c != ' ' && !note.Contains(c))
+                        {
+                            note[noteCount] = c;
+                            num -= c - '0';
+                            noteCount++;
+                            if (noteCount == 8)
+                            {
+                                AddNum(Convert.ToChar(num + '0'), rowNum, colNum);
+                                solved++;
+                                break;
+                            }
+                        }
+                    }
+                    foreach (char c in sudokuArrays[blockNum])
+                    {
+                        if (c != ' ' && !note.Contains(c))
+                        {
+                            note[noteCount] = c;
+                            num -= c - '0';
+                            noteCount++;
+                            if (noteCount == 8)
+                            {
+                                AddNum(Convert.ToChar(num + '0'), rowNum, colNum);
+                                solved++;
+                                break;
+                            }
+                        }
+                    }
                 }
+                notes.Add(rowNum.ToString() + colNum.ToString(), note);
             }
-                
+            blankCount -= solved;
         }
+        //bool BoardSurveyer()
+        //{
+        //    var solved = 0;
+        //    for ()
+        //    {
+
+        //    }
+        //    return false;
+        //}
     }
 }
