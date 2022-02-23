@@ -1,0 +1,245 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace dotnetcore
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+           var input = new char[9][]
+            {
+                new char[9] {' ', '4', ' ', ' ', ' ', ' ', ' ', ' ', '5' },
+                new char[9] {'5', '6', '8', ' ', '1', ' ', '4', ' ', ' ' },
+                new char[9] {'1', ' ', '7', ' ', '5', '4', '6', ' ', ' ' },
+                new char[9] {' ', ' ', ' ', ' ', ' ', '8', ' ', ' ', ' ' },
+                new char[9] {'7', '3', ' ', '1', '6', '2', ' ', '9', '8' },
+                new char[9] {'6', '8', '5', '4', '7', ' ', ' ', '3', ' ' },
+                new char[9] {'4', ' ', ' ', '8', ' ', ' ', '2', '5', ' ' },
+                new char[9] {' ', ' ', ' ', '7', ' ', '6', '3', ' ', ' ' },
+                new char[9] {' ', '2', '6', '3', ' ', '5', ' ', ' ', '1' } 
+            };
+            var x = new SudokuLibrary.SudokuSolver();
+            x.sudokusolversolution(input);
+            var testDict = new Dictionary<string, string>();
+            testDict["a"] = "b";
+            testDict.Remove("a");
+            Console.WriteLine(testDict["a"]);
+            var h = 2;
+            //modify array filler so that it takes in numbers from corresponding arrays that aren't in the primary array. I can create
+            //an array that stores all unique numbers for comparison purposes and continue to subtract from variable num until count == 8
+
+        }
+    }
+}
+namespace SudokuLibrary
+{
+    public static class SudokuValidater
+    {
+        public static void ArgumentValidator(char[][] board)
+        {
+            if(board.GetLength(0) != 9)
+                throw new ArgumentException("Input must be jagged array of 27 character arrays with lengths of 9.");
+            var values = new char[10] { ' ', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+            for(int i = 0; i < 9; i++)
+            {
+                if(board[i].Count() != 9)
+                    throw new ArgumentException("Input must be jagged array of 27 character arrays with lengths of 9.");
+            }
+            for (int i = 0; i < 9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    if(!values.Contains(board[i][j]))
+                        throw new ArgumentException("Each array element must be a number between 1-9 or ' '.");
+                }
+            }
+        }
+
+        public static void SudokuValidatorSolution(char[][] sudokuArrays)
+        {
+            foreach(char[] array in sudokuArrays)
+            {
+                var currentArray = new char[9];
+                for (int i = 0; i < 9; i++)
+                {
+                    if (array[i] != ' ' && currentArray.Contains(array[i]))
+                        throw new ArgumentException("This is not a valid sudoku board.");
+                    currentArray[i] = array[i];
+                }
+            }
+        }
+    }
+    public class BoardOrganizer
+    {
+        public static (char[][], Dictionary<string, int[]>, int[][], int) BoardOrganizerSolution(char[][] board)
+        {
+            //arraylinker Key is position of a character in sudokuArrays and the values are the two other corresponding
+            //array positions. ie. If you give it the position of the character in a row,
+            //it tells you the character's positions in the corresponding column and box.
+            var sudokuArrays = new char[27][];
+            var arrayLinker = new Dictionary<string, int[]>();
+            var blankSpots = new int[81][];
+            var blankCount = 0;
+            int blockNum = 0;
+            int blockPos = 0;
+            for (int i = 0; i < 9; i++)
+            {
+                sudokuArrays[i] = new char[9];
+                for (int j = 0; j < 9; j++)
+                {
+                    blockNum = 18 + (i / 3) * 3 + j / 3;
+                    blockPos = (i % 3) * 3 + j % 3;
+                    if (i == 0)
+                        sudokuArrays[j + 9] = new char[9];
+                    if(i % 3 == 0 && j % 3 == 0)
+                    {
+                        sudokuArrays[blockNum] = new char[9];
+                    }
+                    sudokuArrays[i][j] = board[i][j];
+                    sudokuArrays[j + 9][i] = board[i][j];
+                    sudokuArrays[blockNum][blockPos] = board[i][j];
+                    var iStr = i.ToString();
+                    var jStr = j.ToString();
+                    var jMas9Str = (j + 9).ToString();
+                    var blockNumStr = blockNum.ToString();
+                    var blockPosStr = blockPos.ToString();
+                    arrayLinker.Add
+                        (iStr + jStr, new int[4] { j + 9, i, blockNum, blockPos });
+                    arrayLinker.Add
+                        (jMas9Str + iStr, new int[4] { i, j, blockNum, blockPos });
+                    arrayLinker.Add
+                        (blockNumStr + blockPosStr, new int[4] { i, j, j + 9, i });
+                    if (board[i][j] == ' ')
+                    {
+                        blankSpots[blankCount] = new int[2]{ i, j };
+                        blankCount++;
+                    }
+                }
+            }
+            return (sudokuArrays, arrayLinker, blankSpots, blankCount);
+        }
+    }
+    public class SudokuSolver
+    {
+        char[][] sudokuArrays;
+        int[][] blankSpots;
+        int blankCount;
+        Dictionary<string, int[]> arrayLinker;
+        Dictionary<string, char[]> notes;
+        public void sudokusolversolution(char[][] board)
+        {
+            var sudokuTuple = BoardOrganizer.BoardOrganizerSolution(board);
+            sudokuArrays = sudokuTuple.Item1;
+            arrayLinker = sudokuTuple.Item2;
+            blankSpots = sudokuTuple.Item3;
+            blankCount = sudokuTuple.Item4;
+            SudokuValidater.SudokuValidatorSolution(sudokuArrays);
+            notes = new Dictionary<string, char[]>();
+            var x = blankCount;
+            for(int i = 0; i < x; i++)
+                NoteCreator(blankSpots[i][0], blankSpots[i][1]);
+            //When adding a number, I should add it to any relevant existing notes. If this brings note total to 8,
+            //I should call AddNumber.
+        }
+        void AddNum (char num, int row, int col)
+        {
+            var copositions = arrayLinker[row.ToString() + col.ToString()];
+            sudokuArrays[row][col] = num;
+            sudokuArrays[copositions[0]][copositions[1]] = num;
+            sudokuArrays[copositions[2]][copositions[3]] = num;
+            notes.Remove(row.ToString() + col.ToString());
+            blankCount--;
+        }
+        void ArrayFiller(int arrayNum)
+        {
+            var sudokuArray = sudokuArrays[arrayNum];
+            var num = 45;
+            var count = 0;
+            foreach(char c in sudokuArray)
+            {
+                if (c != ' ')
+                {
+                    count++;
+                    num -= c - '0';
+                }
+            }
+            if(count == 8)
+            {
+                for(int i = 0; i < 9; i++)
+                {
+                    if(sudokuArray[i] == ' ')
+                    {
+                        AddNum(Convert.ToChar(num + '0'), arrayNum, i);
+                        break;
+                    }
+                }
+            }
+        }
+        void NoteCreator(int row, int col)
+        {
+            var blockNum = arrayLinker[row.ToString() + col.ToString()][2];
+            var note = new char[9];
+            var noteCount = 0;
+            var num = 45;
+            var solved = false;
+            for (int j = 0; j < 1; j++)
+            {
+                foreach (char c in sudokuArrays[row])
+                {
+                    if (c != ' ')
+                    {
+                        note[noteCount] = c;
+                        num -= c - '0';
+                        noteCount++;
+                        if (noteCount == 8)
+                        {
+                            solved = true;
+                            break;
+                        }                        
+                    }
+                }
+                foreach (char c in sudokuArrays[col + 9])
+                {
+                    if (c != ' ' && !note.Contains(c))
+                    {
+                        note[noteCount] = c;
+                        num -= c - '0';
+                        noteCount++;
+                        if (noteCount == 8)
+                        {
+                            solved = true;
+                            break;
+                        }
+                    }
+                }
+                foreach (char c in sudokuArrays[blockNum])
+                {
+                    if (c != ' ' && !note.Contains(c))
+                    {
+                        note[noteCount] = c;
+                        num -= c - '0';
+                        noteCount++;
+                        if (noteCount == 8)
+                        {
+                            solved = true;
+                            break;
+                        }
+                    }
+                }
+                notes.Add(row.ToString() + col.ToString(), note);
+                if(solved == true)
+                    AddNum(Convert.ToChar(num + '0'), row, col);
+            }
+        }
+        bool BoardSurveyer()
+        {
+           foreach (KeyValuePair<string, char[]> entry in notes)
+           {
+
+           }
+           return false;
+        }
+    }
+}
