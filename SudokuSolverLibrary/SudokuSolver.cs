@@ -70,7 +70,7 @@ namespace SudokuLibrary
                 var num = 45;
                 for (int j = 0; j < 1; j++)
                 {
-                    foreach (char c in sudokuArrays[i])
+                    foreach (char c in sudokuArrays[rowNum])
                     {
                         if (c != ' ')
                         {
@@ -115,8 +115,8 @@ namespace SudokuLibrary
                             }
                         }
                     }
+                    notes.Add(rowNum.ToString() + colNum.ToString(), note);
                 }
-                notes.Add(rowNum.ToString() + colNum.ToString(), note);
             }
             blankCount -= solved;
         }
