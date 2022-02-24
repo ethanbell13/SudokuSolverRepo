@@ -10,28 +10,27 @@ namespace SudokuLibrary
     {
         public static void ArgumentValidator(char[][] board)
         {
-            if(board.GetLength(0) != 9)
+            if (board.GetLength(0) != 9)
                 throw new ArgumentException("Input must be jagged array of 27 character arrays with lengths of 9.");
             var values = new char[10] { ' ', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-            for(int i = 0; i < 9; i++)
+            for (int i = 0; i < 9; i++)
             {
-                if(board[i].Count() != 9)
+                if (board[i].Count() != 9)
                     throw new ArgumentException("Input must be jagged array of 27 character arrays with lengths of 9.");
             }
             for (int i = 0; i < 9; i++)
             {
                 for (int j = 0; j < 9; j++)
                 {
-                    if(!values.Contains(board[i][j]))
+                    if (!values.Contains(board[i][j]))
                         throw new ArgumentException("Each array element must be a number between 1-9 or ' '.");
                 }
             }
         }
 
-        public static void SudoukuValidatorSolution(char[][] board)
+        public static void SudokuValidatorSolution(char[][] sudokuArrays)
         {
-            var sudokuArrays = BoardOrganizer.BoardOrganizerSolution(board).Item1;
-            foreach(char[] array in sudokuArrays)
+            foreach (char[] array in sudokuArrays)
             {
                 var currentArray = new char[9];
                 for (int i = 0; i < 9; i++)

@@ -6,37 +6,51 @@ namespace SudokuLibrary
     public class SudokuSolver
     {
         char[][] sudokuArrays;
-        Dictionary<string, int[]> arrayLinker;
-        int blankCount;
         int[][] blankSpots;
+        int blankCount;
+        Dictionary<string, int[]> arrayLinker;
         Dictionary<string, char[]> notes;
-        public void sudokusolversolution(char[][] sudokuBoard)
+        bool valueAdded = true;
+        public void sudokusolversolution(char[][] board)
         {
-            SudokuValidater.SudoukuValidatorSolution(sudokuBoard);
-            var sudokuTuple = BoardOrganizer.BoardOrganizerSolution(sudokuBoard);
+            var sudokuTuple = BoardOrganizer.BoardOrganizerSolution(board);
             sudokuArrays = sudokuTuple.Item1;
             arrayLinker = sudokuTuple.Item2;
-            blankCount = sudokuTuple.Item3;
-            blankSpots = sudokuTuple.Item4;
-            notesInit();
-             for(int i = 0; i < 27; i++)
+            blankSpots = sudokuTuple.Item3;
+            blankCount = sudokuTuple.Item4;
+            SudokuValidater.SudokuValidatorSolution(sudokuArrays);
+            notes = new Dictionary<string, char[]>();
+            var x = blankCount;
+            for (int i = 0; i < x; i++)
+                NoteCreator(blankSpots[i][0], blankSpots[i][1]);
+            while(blankCount != 0 && valueAdded == true)
+            {
+                foreach (KeyValuePair<string, char[]> entry in notes)
                 {
-                    ArrayFiller(i);
+                    valueAdded = false;
+                    NoteCreator(entry.Key[0] - '0', entry.Key[1] - '0');
+
                 }
+            }
+            //When adding a number, I should add it to any relevant existing notes. If this brings note total to 8,
+            //I should call AddNumber.
         }
-        void AddNum (char num, int arrayNum, int pos)
+        void AddNum(char num, int row, int col)
         {
-            var copositions = arrayLinker[arrayNum.ToString() + pos.ToString()];
-            sudokuArrays[arrayNum][pos] = num;
+            valueAdded = true;
+            var copositions = arrayLinker[row.ToString() + col.ToString()];
+            sudokuArrays[row][col] = num;
             sudokuArrays[copositions[0]][copositions[1]] = num;
             sudokuArrays[copositions[2]][copositions[3]] = num;
+            notes.Remove(row.ToString() + col.ToString());
+            blankCount--;
         }
         void ArrayFiller(int arrayNum)
         {
             var sudokuArray = sudokuArrays[arrayNum];
             var num = 45;
             var count = 0;
-            foreach(char c in sudokuArray)
+            foreach (char c in sudokuArray)
             {
                 if (c != ' ')
                 {
@@ -44,11 +58,11 @@ namespace SudokuLibrary
                     num -= c - '0';
                 }
             }
-            if(count == 8)
+            if (count == 8)
             {
-                for(int i = 0; i < 9; i++)
+                for (int i = 0; i < 9; i++)
                 {
-                    if(sudokuArray[i] == ' ')
+                    if (sudokuArray[i] == ' ')
                     {
                         AddNum(Convert.ToChar(num + '0'), arrayNum, i);
                         break;
@@ -56,78 +70,71 @@ namespace SudokuLibrary
                 }
             }
         }
-        void notesInit()
+        void NoteCreator(int row, int col)
         {
-            notes = new Dictionary<string, char[]>();
-            var solved = 0;
-            for (int i = 0; i < blankCount; i++)
+            var blockNum = arrayLinker[row.ToString() + col.ToString()][2];
+            var note = new char[9];
+            var noteCount = 0;
+            var num = 45;
+            var solved = false;
+            for (int j = 0; j < 1; j++)
             {
-                var rowNum = blankSpots[i][0];
-                var colNum = blankSpots[i][1];
-                var blockNum = arrayLinker[rowNum.ToString() + colNum.ToString()][2];
-                var note = new char[9];
-                var noteCount = 0;
-                var num = 45;
-                for (int j = 0; j < 1; j++)
+                foreach (char c in sudokuArrays[row])
                 {
-                    foreach (char c in sudokuArrays[rowNum])
+                    if (c != ' ')
                     {
-                        if (c != ' ')
+                        note[noteCount] = c;
+                        num -= c - '0';
+                        noteCount++;
+                        if (noteCount == 8)
                         {
-                            note[noteCount] = c;
-                            num -= c - '0';
-                            noteCount++;
-                            if (noteCount == 8)
-                            {
-                                AddNum(Convert.ToChar(num + '0'), rowNum, colNum);
-                                solved++;
-                                break;
-                            }
+                            solved = true;
+                            break;
                         }
                     }
-                    foreach (char c in sudokuArrays[colNum + 9])
-                    {
-                        if (c != ' ' && !note.Contains(c))
-                        {
-                            note[noteCount] = c;
-                            num -= c - '0';
-                            noteCount++;
-                            if (noteCount == 8)
-                            {
-                                AddNum(Convert.ToChar(num + '0'), rowNum, colNum);
-                                solved++;
-                                break;
-                            }
-                        }
-                    }
-                    foreach (char c in sudokuArrays[blockNum])
-                    {
-                        if (c != ' ' && !note.Contains(c))
-                        {
-                            note[noteCount] = c;
-                            num -= c - '0';
-                            noteCount++;
-                            if (noteCount == 8)
-                            {
-                                AddNum(Convert.ToChar(num + '0'), rowNum, colNum);
-                                solved++;
-                                break;
-                            }
-                        }
-                    }
-                    notes.Add(rowNum.ToString() + colNum.ToString(), note);
                 }
-            }
-            blankCount -= solved;
-        }
-        //bool BoardSurveyer()
-        //{
-        //    var solved = 0;
-        //    for ()
-        //    {
+                foreach (char c in sudokuArrays[col + 9])
+                {
+                    if (c != ' ' && !note.Contains(c))
+                    {
+                        note[noteCount] = c;
+                        num -= c - '0';
+                        noteCount++;
+                        if (noteCount == 8)
+                        {
+                            solved = true;
+                            break;
+                        }
+                    }
+                }
+                foreach (char c in sudokuArrays[blockNum])
+                {
+                    if (c != ' ' && !note.Contains(c))
+                    {
+                        note[noteCount] = c;
+                        num -= c - '0';
+                        noteCount++;
+                        if (noteCount == 8)
+                        {
+                            solved = true;
+                            break;
+                        }
+                    }
+                }
+                if (!notes.ContainsKey(row.ToString() + col.ToString()))
+                    notes.Add(row.ToString() + col.ToString(), note);
 
-        //    }
-        //    return false;
-        //}
+                if (solved == true)
+                    AddNum(Convert.ToChar(num + '0'), row, col);
+            }
+        }
+        bool BoardSurveyer()
+        {
+            foreach (KeyValuePair<string, char[]> entry in notes)
+            {
+
+            }
+            return false;
+        }
     }
 }

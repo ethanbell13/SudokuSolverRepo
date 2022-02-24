@@ -8,21 +8,17 @@ namespace SudokuLibrary
 {
     public class BoardOrganizer
     {
-        //Orgainzed the soduku board into a jaggedd array with 27 arrays of 9 characters. Rows = Arrays 0-8,
-        //Columns = Arrays 9-17, and Blocks = Arrays 18-26.
-        public static (char[][], Dictionary<string, int[]>, int, int[][]) BoardOrganizerSolution(char[][] board)
+        public static (char[][], Dictionary<string, int[]>, int[][], int) BoardOrganizerSolution(char[][] board)
         {
-            SudokuLibrary.SudokuValidater.ArgumentValidator(board);
             //arraylinker Key is position of a character in sudokuArrays and the values are the two other corresponding
             //array positions. ie. If you give it the position of the character in a row,
             //it tells you the character's positions in the corresponding column and box.
-            var arrayLinker = new Dictionary<string, int[]>();
             var sudokuArrays = new char[27][];
-            int blockNum = 0;
-            int blockPos;
-            var blankCount = 0;
+            var arrayLinker = new Dictionary<string, int[]>();
             var blankSpots = new int[81][];
-            //Add array connectons to dictionary as you add units to sudokuArrays
+            var blankCount = 0;
+            int blockNum = 0;
+            int blockPos = 0;
             for (int i = 0; i < 9; i++)
             {
                 sudokuArrays[i] = new char[9];
@@ -32,7 +28,7 @@ namespace SudokuLibrary
                     blockPos = (i % 3) * 3 + j % 3;
                     if (i == 0)
                         sudokuArrays[j + 9] = new char[9];
-                    if(i % 3 == 0 && j % 3 == 0)
+                    if (i % 3 == 0 && j % 3 == 0)
                     {
                         sudokuArrays[blockNum] = new char[9];
                     }
@@ -52,12 +48,12 @@ namespace SudokuLibrary
                         (blockNumStr + blockPosStr, new int[4] { i, j, j + 9, i });
                     if (board[i][j] == ' ')
                     {
-                        blankSpots[blankCount] = new int[2] { i, j};
+                        blankSpots[blankCount] = new int[2] { i, j };
                         blankCount++;
                     }
                 }
             }
-            return (sudokuArrays, arrayLinker, blankCount, blankSpots);
+            return (sudokuArrays, arrayLinker, blankSpots, blankCount);
         }
     }
 }
