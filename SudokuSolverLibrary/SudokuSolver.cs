@@ -25,6 +25,10 @@ namespace SudokuLibrary
                 NoteCreator(blankSpots[i][0], blankSpots[i][1]);
             while(blankCount != 0 && valueAdded == true)
             {
+                for(int i = 1; i < 10; i++)
+                {
+                    ScanByNumber(Convert.ToChar(num + '0'));
+                }
                 foreach (KeyValuePair<string, char[]> entry in notes)
                 {
                     valueAdded = false;
@@ -44,6 +48,32 @@ namespace SudokuLibrary
             sudokuArrays[copositions[2]][copositions[3]] = num;
             notes.Remove(row.ToString() + col.ToString());
             blankCount--;
+        }
+        void ScanByNumber(char c)
+        {
+            for(int i = 18; i < 27; i++)
+            {
+                var block = sudokuArrays[i];
+                if(block.Contains(c))
+                    break;
+                var openSpots = new string[9]();
+                var count = 0;
+                for(int j; j < 9; j++)
+                {
+                    var str = i.ToString() + j.ToString();
+                    var coPositions = arrayLinker[str];
+                    if(block[j] == ' ' && !sudokuArrays[coPositions[0]].Contains(c) && !sudokuArrays[coPositions[2].Contains(col))
+                    {
+                        openSpots[count] = str;
+                        count++;
+                    }
+                }
+                if(count == 1)
+                {
+                    var coPositions = arrayLinker[openSpots[0]];
+                    AddNum(c, coPositions[0], coPositions[1]);   
+                }
+            }
         }
         void ArrayFiller(int arrayNum)
         {
