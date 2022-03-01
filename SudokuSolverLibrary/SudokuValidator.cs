@@ -15,7 +15,7 @@ namespace SudokuLibrary
             var values = new char[10] { ' ', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
             for (int i = 0; i < 9; i++)
             {
-                if (board[i].Count() != 9)
+                if (board[i].Length != 9)
                     throw new ArgumentException("Input must be jagged array of 27 character arrays with lengths of 9.");
             }
             for (int i = 0; i < 9; i++)
@@ -35,7 +35,7 @@ namespace SudokuLibrary
                 var currentArray = new char[9];
                 for (int i = 0; i < 9; i++)
                 {
-                    if (array[i] != ' ' && currentArray.Contains(array[i]))
+                    if (array[i] != ' ' && array[i] != '\0' && currentArray.Contains(array[i]))
                         throw new ArgumentException("This is not a valid sudoku board.");
                     currentArray[i] = array[i];
                 }
