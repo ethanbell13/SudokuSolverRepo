@@ -12,12 +12,12 @@ namespace SudokuLibrary
         static void ArgumentValidator(char[][] board)
         {
             if (board.GetLength(0) != 9)
-                throw new ArgumentException("Input must be jagged array of 27 character arrays with lengths of 9.");
+                throw new ArgumentException("Input must be jagged array of 9 character arrays with lengths of 9.");
             var values = new char[10] { ' ', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
             for (int i = 0; i < 9; i++)
             {
                 if (board[i].Length != 9)
-                    throw new ArgumentException("Input must be jagged array of 27 character arrays with lengths of 9.");
+                    throw new ArgumentException("Input must be jagged array of 9 character arrays with lengths of 9.");
             }
             for (int i = 0; i < 9; i++)
             {
@@ -76,24 +76,25 @@ namespace SudokuLibrary
             notes.Remove(row.ToString() + col.ToString());
             EditNotes(num, row, col);
         }
-        void EditNotes(char num, int row, int col)
+        void EditNotes(char num, int sudokuArray, int col)
         {
-            var copositions = arrayLinker[row.ToString() + col.ToString()];
-            for(int i = 0; i < 3; i += 2)
+            for (int i = 0; i < 9; i++)
             {
-                var coPos = copositions[0 + i].ToString() + copositions[1 + i].ToString();
-                if (notes.ContainsKey(coPos))
+                var coPosistions = arrayLinker[sudokuArray.ToString() + i.ToString()];
+                if(sudokuArray < 9)
                 {
-                    var note = notes[coPos];
+                    var str = sudokuArray.ToString() + i.ToString();
+                    var note = notes[str];
                     if (note.Contains(num))
                     {
                         var index = note.IndexOf(num);
                         note = note.Remove(index, 1);
                         if (note.Length == 1)
-                            AddNum(num, row, col);
+                            AddNum(num, sudokuArray, col);
                         else
-                            notes[coPos] = note;
+                            notes[str] = note;
                     }
+
                 }
             }
         }
@@ -134,6 +135,26 @@ namespace SudokuLibrary
                     var coPositions = arrayLinker[openSpots[0]];
                     AddNum(c, coPositions[0], coPositions[1]);
                     valueAdded = true;
+                }
+                else if (count <= 3)
+                {
+                    var row= arrayLinker[openSpots[0]][0];
+                    var col = arrayLinker[openSpots[0]][1];
+                    if((arrayLinker[openSpots[1]][0] == row || arrayLinker[openSpots[1]][1] == col) ||
+                        ((arrayLinker[openSpots[1]][0] == row && arrayLinker[openSpots[2]][0] == row) || 
+                        (arrayLinker[openSpots[1]][1] == col && arrayLinker[openSpots[2]][2] == col)))
+                    {
+                        
+                    }
+                    else if (count == 2)
+                    {
+
+                    }
+                    
+                }
+                else if (count == 2)
+                {
+
                 }
             }
         }
