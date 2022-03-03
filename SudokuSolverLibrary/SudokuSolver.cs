@@ -69,62 +69,86 @@ namespace SudokuLibrary
         }
         void AddNum(char num, int row, int col)
         {
-            var copositions = arrayLinker[row.ToString() + col.ToString()];
+            var coPositions = arrayLinker[row.ToString() + col.ToString()];
             sudokuArrays[row][col] = num;
-            sudokuArrays[copositions[0]][copositions[1]] = num;
-            sudokuArrays[copositions[2]][copositions[3]] = num;
+            sudokuArrays[coPositions[0]][coPositions[1]] = num;
+            sudokuArrays[coPositions[2]][coPositions[3]] = num;
             notes.Remove(row.ToString() + col.ToString());
-            EditNotes(num, row, col);
+            EditNotes(num, row);
+            EditNotes(num, col + 9);
+            EditNotes(num, coPositions[2]);
+            BoardValidator(sudokuArrays);
         }
-        void EditNotes(char num, int sudokuArray, int col)
+        void EditNotes(char num, int sudokuArray, string[] exceptions = null)
         {
+            var row = 0;
+            var col = 0;
+            var str = "";
             for (int i = 0; i < 9; i++)
             {
+                
                 var coPosistions = arrayLinker[sudokuArray.ToString() + i.ToString()];
-                if(sudokuArray < 9)
+                if (sudokuArray < 9)
                 {
-                    var str = sudokuArray.ToString() + i.ToString();
+                    row = sudokuArray;
+                    col = i;
+                    str = row.ToString() + col.ToString();
+                }
+                else
+                {
+                    row = coPosistions[0];
+                    col = coPosistions[1];
+                    str = row.ToString() + col.ToString();
+                }
+                if (exceptions != null && exceptions.Contains(str))
+                    continue;
+                else if (notes.ContainsKey(str) && notes[str].Contains(num))
+                {
                     var note = notes[str];
-                    if (note.Contains(num))
+                    var index = note.IndexOf(num);
+                    note = note.Remove(index, 1);
+                    if (note.Length == 1)
                     {
-                        var index = note.IndexOf(num);
-                        note = note.Remove(index, 1);
-                        if (note.Length == 1)
-                            AddNum(num, sudokuArray, col);
-                        else
-                            notes[str] = note;
+                        AddNum(num, row, col);
+                        valueAdded = true;
                     }
-
+                    else
+                    {
+                        notes[str] = note;
+                        valueAdded = true;
+                    }
                 }
             }
         }
         public static void BoardValidator(char[][] sudokuArrays)
         {
-            foreach (char[] array in sudokuArrays)
+            for (int i = 0; i < 27; i++)
             {
                 var currentArray = new char[9];
-                for (int i = 0; i < 9; i++)
+                for (int j = 0; j < 9; j++)
                 {
-                    if (array[i] != ' ' && array[i] != '\0' && currentArray.Contains(array[i]))
+                    if (sudokuArrays[i][j] != '\0' && currentArray.Contains(sudokuArrays[i][j]))
                         throw new ArgumentException("This is not a valid sudoku board.");
-                    currentArray[i] = array[i];
+                    currentArray[j] = sudokuArrays[i][j];
                 }
             }
         }
-        void ScanByNumber(char c)
+        void ScanByNumber(char num)
         {
+            var array = 0;
             for (int i = 18; i < 27; i++)
-            {
+            {   //for some reason 7 is causing errors
                 var block = sudokuArrays[i];
-                if (block.Contains(c))
+                if (block.Contains(num))
                     continue;
                 var openSpots = new string[9];
                 var count = 0;
+                string[] exceptions;
                 for (int j = 0; j < 9; j++)
                 {
                     var str = i.ToString() + j.ToString();
                     var coPositions = arrayLinker[str];
-                    if (block[j] == '\0' && !sudokuArrays[coPositions[0]].Contains(c) && !sudokuArrays[coPositions[2]].Contains(c))
+                    if (block[j] == '\0' && !sudokuArrays[coPositions[0]].Contains(num) && !sudokuArrays[coPositions[2]].Contains(num))
                     {
                         openSpots[count] = str;
                         count++;
@@ -133,28 +157,28 @@ namespace SudokuLibrary
                 if (count == 1)
                 {
                     var coPositions = arrayLinker[openSpots[0]];
-                    AddNum(c, coPositions[0], coPositions[1]);
+                    AddNum(num, coPositions[0], coPositions[1]);
                     valueAdded = true;
                 }
-                else if (count <= 3)
+                else if (count == 3 || count == 2)
                 {
                     var row= arrayLinker[openSpots[0]][0];
                     var col = arrayLinker[openSpots[0]][1];
-                    if((arrayLinker[openSpots[1]][0] == row || arrayLinker[openSpots[1]][1] == col) ||
-                        ((arrayLinker[openSpots[1]][0] == row && arrayLinker[openSpots[2]][0] == row) || 
-                        (arrayLinker[openSpots[1]][1] == col && arrayLinker[openSpots[2]][2] == col)))
+                    if ((count == 2 && arrayLinker[openSpots[1]][0] == row) ||
+                        (count == 3 && arrayLinker[openSpots[1]][0] == row && arrayLinker[openSpots[2]][0] == row))
+                        array = row;
+                    else if ((count == 2 && arrayLinker[openSpots[1]][1] == col) ||
+                        (count == 3 && arrayLinker[openSpots[1]][1] == col && arrayLinker[openSpots[2]][1] == col))
+                        array = col + 9;
+                    else
+                        continue;
+                    exceptions = new string[count];
+                    for (int j = 0; j < count; j++)
                     {
-                        
+                        var coPositions = arrayLinker[openSpots[j]];
+                        exceptions[j] = coPositions[0].ToString() + coPositions[1].ToString();
                     }
-                    else if (count == 2)
-                    {
-
-                    }
-                    
-                }
-                else if (count == 2)
-                {
-
+                    EditNotes(num, array, exceptions);
                 }
             }
         }
