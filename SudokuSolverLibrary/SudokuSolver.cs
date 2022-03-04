@@ -109,7 +109,7 @@ namespace SudokuLibrary
                     note = note.Remove(index, 1);
                     if (note.Length == 1)
                     {
-                        AddNum(num, row, col);
+                        AddNum(note[0], row, col);
                         valueAdded = true;
                     }
                     else

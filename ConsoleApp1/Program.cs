@@ -9,8 +9,7 @@ namespace ConsoleApp1
         static void Main(string[] args)
         {
             var input = new char[9][]
-             {
-                //Integrate method that finds values based on what spaces are available in a box for a given number
+            {
                 new char[9] {' ', '3', ' ', '1', ' ', ' ', ' ', '8', '4' },
                 new char[9] {' ', '8', ' ', ' ', '4', ' ', '3', '9', ' ' },
                 new char[9] {' ', '6', ' ', '8', ' ', ' ', ' ', ' ', ' ' },
@@ -23,7 +22,7 @@ namespace ConsoleApp1
              };
             var x = new SudokuLibrary.SudokuSolver();
             x.SudokuSolverSolution(input);
-            for(int i = 0; i < 9; i++)
+            for (int i = 0; i < 9; i++)
             {
                 var row = "";
                 for (int j = 0; j < 9; j++)
