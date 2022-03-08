@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace SudokuLibrary
 {
     public class SudokuSolver
@@ -48,8 +52,8 @@ namespace SudokuLibrary
                     arrayLinker.Add
                         (blockNum.ToString() + blockPos.ToString(), new int[4] { i, j, j + 9, i });
                     notes.Add(iStr + jStr, "123456789");
-		    notes.Add((j + 9).ToString() + iStr, "123456789");
-	            notes.Add(blockNum.ToString() + blockPos.ToString(), "123456789");
+		            notes.Add((j + 9).ToString() + iStr, "123456789");
+	                notes.Add(blockNum.ToString() + blockPos.ToString(), "123456789");
                 }
             }
         }
@@ -72,9 +76,9 @@ namespace SudokuLibrary
             sudokuArrays[array][pos] = num;
             sudokuArrays[coPositions[0]][coPositions[1]] = num;
             sudokuArrays[coPositions[2]][coPositions[3]] = num;
-	    notes.Remove(array.ToString() + pos.ToString());
+	        notes.Remove(array.ToString() + pos.ToString());
             notes.Remove(coPositions[0].ToString() + coPositions[1].ToString());
-	    notes.Remove(coPositions[2].ToString() + coPositions[3].ToString());
+	        notes.Remove(coPositions[2].ToString() + coPositions[3].ToString());
             EditNotes(num, array);
             EditNotes(num, coPositions[0]);
             EditNotes(num, coPositions[2]);
@@ -84,9 +88,8 @@ namespace SudokuLibrary
         {
             for (int i = 0; i < 9; i++)
             {
-                
-                var coPosistions = arrayLinker[sudokuArray.ToString() + i.ToString()];
-		var str = array.ToString() + i.ToString();
+                var coPositions = arrayLinker[array.ToString() + i.ToString()];
+		        var str = array.ToString() + i.ToString();
                 if (exceptions != null && exceptions.Contains(str))
                     continue;
                 else if (notes.ContainsKey(str) && notes[str].Contains(num))
@@ -102,8 +105,8 @@ namespace SudokuLibrary
                     else
                     {
                         notes[str] = note;
-			notes[coPositions[0].ToString() + coPositions[1].ToString()] = note;
-			notes[coPositions[2].ToString() + coPositions[3].ToString()] = note;
+			            notes[coPositions[0].ToString() + coPositions[1].ToString()] = note;
+			            notes[coPositions[2].ToString() + coPositions[3].ToString()] = note;
                         valueAdded = true;
                     }
                 }
@@ -163,17 +166,60 @@ namespace SudokuLibrary
                         array = col + 9;
                     else
                         continue;
-                    exceptions = new string[count];
-                    for (int j = 0; j < count * 2; j += 2)
+                    exceptions = new string[count * 2];
+                    for (int j = 0; j < count; j ++)
                     {
                         var coPositions = arrayLinker[openSpots[j]];
                         exceptions[j] = coPositions[0].ToString() + coPositions[1].ToString();
-			exceptions[j + 1] = coPositions[2].ToString() + coPositions[3].ToString();
+			            exceptions[j + 1] = coPositions[2].ToString() + coPositions[3].ToString();
                     }
                     EditNotes(num, array, exceptions);
                 }
             }
         }
+        void ScanNotes(int arrayNum)
+        {
+            var blankCount = 0;
+            var array = sudokuArrays[arrayNum];
+            string note;
+            for (int i = 0; i < 9; i++)
+            {
+                if (array[i] == '\0')
+                    blankCount++;
+            }
+            var exceptions = new string[9];
+            for (int i = 0; i < 9; i++)
+            {
+                if (array[i] != '\0') 
+                {
+                    continue;
+                }
+                exceptions[i] = arrayNum.ToString() + i.ToString();
+                note = notes[arrayNum.ToString() + i.ToString()];
+                for (int j = i + 1; j < 9; j++)
+                {
+                    if(array[j] != '\0')
+                    {
+                        continue;
+                    }
+                    foreach (char c in notes[arrayNum.ToString() + j.ToString()])
+                    {
+                        if (!note.Contains(c))
+                        {
+                            note += c;
+                            exceptions[i] = arrayNum.ToString() + j.ToString();
+                        }
+                    }
+                }
+                if (note.Length == blankCount)
+                    continue;
+                foreach(char c in note)
+                {
+                    EditNotes(c, arrayNum, exceptions);
+                }
+            }
+        }
+        
         public void SudokuSolverSolution(char[][] board)
         {
             ArgumentValidator(board);
@@ -184,42 +230,11 @@ namespace SudokuLibrary
             {
                 valueAdded = false;
                 for (int i = 1; i < 10; i++)
-                {
                     ScanByNumber(Convert.ToChar(i + '0'));
-                }
+                //for (int i = 1; i < 27; i++)
+                //    ScanNotes(i);
             }
         }
     }
-}
-
-void ScanNotes(int arrayNum)
-{
-	var blankCount = 0;
-	var str = "";
-	int[] 	CoPositions;
-	array = sudokuArrays[arrayNum];
-	var collectiveNote;
-	for(int i = 0; i < 9; i++)
-	{
-		if(sudokuArray[i] != '\0')
-			blankCount++;
-	}
-	for(int i = 0; i < 9; i++)
-	{
-		if(sudokuArray[i] != '\0')
-			continue;
-		collectiveNote = notes[arrayNum.ToString() + i.ToString()];
-		for(int j = i; j < 9; j++)
-		{
-			foreach(char c in notes[arrayNum.ToString() + j.ToString()])
-			{
-				if(!collectiveNote.Contains(c))
-					collectiveNote += c;	
-			}		
-		}
-		if(collectiveNote.Length() == blankSpots)
-			continue;
-		
-	}	
 }
 
