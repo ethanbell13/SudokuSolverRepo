@@ -137,7 +137,9 @@ namespace SudokuLibrary
                 {
                     var str = i.ToString() + j.ToString();
                     var coPositions = arrayLinker[str];
-                    if (block[j] == '\0' && !sudokuArrays[coPositions[0]].Contains(num) && !sudokuArrays[coPositions[2]].Contains(num))
+                    var row = coPositions[0];
+                    if (block[j] == '\0' && !sudokuArrays[row].Contains(num) && !sudokuArrays[coPositions[2]].Contains(num) 
+                        && notes[row.ToString() + coPositions[1].ToString()].Contains(num))
                     {
                         openSpots[count] = str;
                         count++;
