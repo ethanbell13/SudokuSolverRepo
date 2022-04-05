@@ -8,27 +8,31 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            var input = new char[9][]
-            {
-                new char[9] {' ', '3', ' ', '1', ' ', ' ', ' ', '8', '4' },
-                new char[9] {' ', '8', ' ', ' ', '4', ' ', '3', '9', ' ' },
-                new char[9] {' ', '6', ' ', '8', ' ', ' ', ' ', ' ', ' ' },
-                new char[9] {' ', ' ', '4', ' ', ' ', ' ', '8', ' ', ' ' },
-                new char[9] {' ', '1', '3', ' ', ' ', ' ', ' ', '7', ' ' },
-                new char[9] {' ', ' ', '2', '6', ' ', ' ', '5', '4', ' ' },
-                new char[9] {' ', '2', ' ', ' ', ' ', ' ', '4', ' ', '5' },
-                new char[9] {'1', ' ', ' ', ' ', ' ', '9', ' ', ' ', ' ' },
-                new char[9] {' ', ' ', ' ', '5', '6', '1', '9', ' ', ' ' }
-             };
-            var x = new SudokuLibrary.SudokuSolver();
-            x.SudokuSolverSolution(input);
-            for (int i = 0; i < 9; i++)
-            {
-                var row = "";
-                for (int j = 0; j < 9; j++)
-                    row += x.sudokuArrays[i][j] + " ";
-                Console.WriteLine(row);
-            }
+            //var input = new char[9][]
+            //{
+            //    new char[9] {' ', '3', ' ', '1', ' ', ' ', ' ', '8', '4' },
+            //    new char[9] {' ', '8', ' ', ' ', '4', ' ', '3', '9', ' ' },
+            //    new char[9] {' ', '6', ' ', '8', ' ', ' ', ' ', ' ', ' ' },
+            //    new char[9] {' ', ' ', '4', ' ', ' ', ' ', '8', ' ', ' ' },
+            //    new char[9] {' ', '1', '3', ' ', ' ', ' ', ' ', '7', ' ' },
+            //    new char[9] {' ', ' ', '2', '6', ' ', ' ', '5', '4', ' ' },
+            //    new char[9] {' ', '2', ' ', ' ', ' ', ' ', '4', ' ', '5' },
+            //    new char[9] {'1', ' ', ' ', ' ', ' ', '9', ' ', ' ', ' ' },
+            //    new char[9] {' ', ' ', ' ', '5', '6', '1', '9', ' ', ' ' }
+            // };
+            //var x = new SudokuLibrary.SudokuSolver();
+            //x.SudokuSolverSolution(input);
+            //for (int i = 0; i < 9; i++)
+            //{
+            //    var row = "";
+            //    for (int j = 0; j < 9; j++)
+            //        row += x.sudokuArrays[i][j] + " ";
+            //    Console.WriteLine(row);
+            //}
+            var z = "123";
+            z += z[2] - 49;
+            var x = z.Remove(2, 1);
+            var y = 2;
         }
     }
 }
