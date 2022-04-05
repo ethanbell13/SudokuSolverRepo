@@ -75,15 +75,12 @@ namespace SudokuLibrary
             sudokuArrays[array][pos] = num;
             sudokuArrays[coPositions[0]][coPositions[1]] = num;
             sudokuArrays[coPositions[2]][coPositions[3]] = num;
-<<<<<<< HEAD
             notes.Remove(array.ToString() + pos.ToString());
             notes.Remove(coPositions[0].ToString() + coPositions[1].ToString());
             notes.Remove(coPositions[2].ToString() + coPositions[3].ToString());
-=======
 	    notes.Remove(array.ToString() + pos.ToString());
             notes.Remove(coPositions[0].ToString() + coPositions[1].ToString());
 	    notes.Remove(coPositions[2].ToString() + coPositions[3].ToString());
->>>>>>> main
             EditNotes(num, array);
             EditNotes(num, coPositions[0]);
             EditNotes(num, coPositions[2]);
@@ -94,11 +91,8 @@ namespace SudokuLibrary
             for (int i = 0; i < 9; i++)
             {
                 var coPositions = arrayLinker[array.ToString() + i.ToString()];
-<<<<<<< HEAD
                 var str = array.ToString() + i.ToString();
-=======
 		var str = array.ToString() + i.ToString();
->>>>>>> main
                 if (exceptions != null && exceptions.Contains(str))
                     continue;
                 else if (sudokuArrays[array][i] == '\0' && notes[str].Contains(num))
@@ -114,17 +108,72 @@ namespace SudokuLibrary
                     else
                     {
                         notes[str] = note;
-<<<<<<< HEAD
                         notes[coPositions[0].ToString() + coPositions[1].ToString()] = note;
                         notes[coPositions[2].ToString() + coPositions[3].ToString()] = note;
-=======
 			notes[coPositions[0].ToString() + coPositions[1].ToString()] = note;
 			notes[coPositions[2].ToString() + coPositions[3].ToString()] = note;
->>>>>>> main
                         valueAdded = true;
+                    }
+		    if(note.Length == 2)
+                    {
+                        NakedPair(array, i, note);
+                        NakedPair(coPositions[0], i, note);
+                        NakedPair(coPositions[2], i, note);
                     }
                 }
             }
+        }
+	void NakedPair(int array, int pos, string note) 
+        {
+            var str = array.ToString() + pos.ToString();
+            for(int i = 0; i < 9; i++)
+            {
+                if (sudokuArrays[array][i] != '\0' || pos == i)
+                    continue;
+                var str2 = array.ToString() + i.ToString();
+                if (notes[str] == notes[str2])
+                {
+                    var exceptions = new string[2] { str, str2 };
+                    var num1 = notes[str][0];
+                    var num2 = notes[str2][1]; 
+                    EditNotes(num1, array, exceptions);
+                    EditNotes(num2, array, exceptions);
+                    var coPositions1 = arrayLinker[str];
+                    var coPositions2 = arrayLinker[str2];
+                    if(coPositions1[0] == coPositions2[0])
+                    {
+                        exceptions = new string[2] 
+                        {coPositions1[0].ToString() + coPositions1[1].ToString(), coPositions2[0].ToString() + coPositions2[1].ToString()};
+                        array = coPositions1[0];
+                        EditNotes(num1, array, exceptions);
+                        EditNotes(num2, array, exceptions);
+                    }
+                    else if(coPositions1[2] == coPositions2[2])
+                    {
+                        exceptions = new string[2] 
+                        {coPositions1[2].ToString() + coPositions1[3].ToString(), coPositions2[2].ToString() + coPositions2[3].ToString()};
+                        array = coPositions1[2];
+                        EditNotes(num1, array, exceptions);
+                        EditNotes(num2, array, exceptions);
+                    }
+                }           
+            }
+        }
+        void NakedTriplets(int array, int pos, string note)
+        {
+        	var str = array.ToString() + pos.ToString();
+            var note1 = notes[str];
+		    for(int i = 0; i < 9; i++)
+		    {
+                if (sudokuArrays[array][i] != '\0' || pos == i)
+                    continue;
+                var str2 = array.ToString() + i.ToString();
+                var note2 = notes[str2];
+                if(note == note2)
+                {
+                    for(int j = i; )
+                }
+		    }	
         }
         public static void BoardValidator(char[][] sudokuArrays)
         {
@@ -277,7 +326,6 @@ namespace SudokuLibrary
                     else
                         continue;
                     exceptions = new string[count];
-<<<<<<< HEAD
                     for (int j = 0; j < count; j++)
                     {
                         var coPositions = arrayLinker[openSpots[j]];
@@ -285,7 +333,6 @@ namespace SudokuLibrary
                             exceptions[j] = coPositions[0].ToString() + coPositions[1].ToString();
                         else
                             exceptions[j] = coPositions[2].ToString() + coPositions[3].ToString();
-=======
                     for (int j = 0; j < count; j ++)
                     {
                         var coPositions = arrayLinker[openSpots[j]];
@@ -293,14 +340,11 @@ namespace SudokuLibrary
 			    exceptions[j] = coPositions[0].ToString() + coPositions[1].ToString();
                         else
 			    exceptions[j] = coPositions[2].ToString() + coPositions[3].ToString();
->>>>>>> main
                     }
                     EditNotes(num, array, exceptions);
                 }
             }
         }
-<<<<<<< HEAD
-=======
         void ScanNotes(int arrayNum)
         {
             var blankCount = 0;
@@ -345,9 +389,6 @@ namespace SudokuLibrary
                 }
             }
         }
->>>>>>> main
-        
-
         public void SudokuSolverSolution(char[][] board)
         {
             ArgumentValidator(board);
@@ -358,11 +399,8 @@ namespace SudokuLibrary
             {
                 valueAdded = false;
                 for (int i = 1; i < 10; i++)
-<<<<<<< HEAD
                     ScanByBox(Convert.ToChar(i + '0'));
-=======
                     ScanByNumber(Convert.ToChar(i + '0'));
->>>>>>> main
                 if (valueAdded == false)
                 {
                     for (int i = 0; i < 27; i++)
