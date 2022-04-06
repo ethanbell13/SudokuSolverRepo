@@ -78,13 +78,12 @@ namespace SudokuLibrary
             notes.Remove(array.ToString() + pos.ToString());
             notes.Remove(coPositions[0].ToString() + coPositions[1].ToString());
             notes.Remove(coPositions[2].ToString() + coPositions[3].ToString());
-	    notes.Remove(array.ToString() + pos.ToString());
+            notes.Remove(array.ToString() + pos.ToString());
             notes.Remove(coPositions[0].ToString() + coPositions[1].ToString());
-	    notes.Remove(coPositions[2].ToString() + coPositions[3].ToString());
+            notes.Remove(coPositions[2].ToString() + coPositions[3].ToString());
             EditNotes(num, array);
             EditNotes(num, coPositions[0]);
             EditNotes(num, coPositions[2]);
-            BoardValidator(sudokuArrays);
         }
         void EditNotes(char num, int array, string[] exceptions = null)
         {
@@ -92,7 +91,6 @@ namespace SudokuLibrary
             {
                 var coPositions = arrayLinker[array.ToString() + i.ToString()];
                 var str = array.ToString() + i.ToString();
-		var str = array.ToString() + i.ToString();
                 if (exceptions != null && exceptions.Contains(str))
                     continue;
                 else if (sudokuArrays[array][i] == '\0' && notes[str].Contains(num))
@@ -110,70 +108,92 @@ namespace SudokuLibrary
                         notes[str] = note;
                         notes[coPositions[0].ToString() + coPositions[1].ToString()] = note;
                         notes[coPositions[2].ToString() + coPositions[3].ToString()] = note;
-			notes[coPositions[0].ToString() + coPositions[1].ToString()] = note;
-			notes[coPositions[2].ToString() + coPositions[3].ToString()] = note;
+                        notes[coPositions[0].ToString() + coPositions[1].ToString()] = note;
+                        notes[coPositions[2].ToString() + coPositions[3].ToString()] = note;
                         valueAdded = true;
                     }
-		    if(note.Length == 2)
+                    if (note.Length <= 4)
                     {
-                        NakedPair(array, i, note);
-                        NakedPair(coPositions[0], i, note);
-                        NakedPair(coPositions[2], i, note);
+                        NakedCandidates(array, i, note);
+                        NakedCandidates(coPositions[0], coPositions[1], note);
+                        NakedCandidates(coPositions[2], coPositions[3], note);
                     }
                 }
             }
         }
-	void NakedPair(int array, int pos, string note) 
+        Tuple<int, string, string> FindOtherCandidate(int array, int pos, int curPos, string note)
         {
-            var str = array.ToString() + pos.ToString();
-            for(int i = 0; i < 9; i++)
+            for(int i = curPos; i < 9; i++)
             {
                 if (sudokuArrays[array][i] != '\0' || pos == i)
                     continue;
-                var str2 = array.ToString() + i.ToString();
-                if (notes[str] == notes[str2])
+                var contains = true;
+                var curStr = array.ToString() + i.ToString();
+                var curNote = notes[curStr];
+                foreach (char c in curNote)
                 {
-                    var exceptions = new string[2] { str, str2 };
-                    var num1 = notes[str][0];
-                    var num2 = notes[str2][1]; 
-                    EditNotes(num1, array, exceptions);
-                    EditNotes(num2, array, exceptions);
-                    var coPositions1 = arrayLinker[str];
-                    var coPositions2 = arrayLinker[str2];
-                    if(coPositions1[0] == coPositions2[0])
+                    if (!note.Contains(c))
                     {
-                        exceptions = new string[2] 
-                        {coPositions1[0].ToString() + coPositions1[1].ToString(), coPositions2[0].ToString() + coPositions2[1].ToString()};
-                        array = coPositions1[0];
-                        EditNotes(num1, array, exceptions);
-                        EditNotes(num2, array, exceptions);
+                        contains = false;
+                        break;
                     }
-                    else if(coPositions1[2] == coPositions2[2])
-                    {
-                        exceptions = new string[2] 
-                        {coPositions1[2].ToString() + coPositions1[3].ToString(), coPositions2[2].ToString() + coPositions2[3].ToString()};
-                        array = coPositions1[2];
-                        EditNotes(num1, array, exceptions);
-                        EditNotes(num2, array, exceptions);
-                    }
-                }           
-            }
-        }
-        void NakedTriplets(int array, int pos, string note)
-        {
-        	var str = array.ToString() + pos.ToString();
-            var note1 = notes[str];
-		    for(int i = 0; i < 9; i++)
-		    {
-                if (sudokuArrays[array][i] != '\0' || pos == i)
-                    continue;
-                var str2 = array.ToString() + i.ToString();
-                var note2 = notes[str2];
-                if(note == note2)
-                {
-                    for(int j = i; )
                 }
-		    }	
+                if (!contains)
+                    continue;
+                return Tuple.Create(i, curStr, curNote);
+            }
+            return Tuple.Create(0, "", "");
+        }
+        void NakedCandidates(int array, int pos, string note)
+        {
+            var newPos = pos;
+            var exceptions = new string[4];
+            exceptions[0] = array.ToString() + pos.ToString();
+            var candidateNotes = new string[4];
+            candidateNotes[0] = note;
+            var coArray1 = arrayLinker[array.ToString() + pos.ToString()][0];
+            var coArray2 = arrayLinker[array.ToString() + pos.ToString()][2];
+            var shared1 = true;
+            var shared2 = true;
+            for (int i = 1; i < note.Length; i++)
+            {
+                var tuple = FindOtherCandidate(array, pos, newPos, note);
+                if (tuple.Item1 == 0)
+                    return;
+                newPos = tuple.Item1;
+                exceptions[i] = tuple.Item2;
+                candidateNotes[i] = tuple.Item3;
+            }
+		    for(int i = 0; i < note.Length; i++)
+            {
+                EditNotes(note[i], array, exceptions);
+                if (coArray1 != arrayLinker[exceptions[i]][0])
+                    shared1 = false;
+                else if(coArray2 != arrayLinker[exceptions[i]][2])
+                    shared2 = false;
+            }
+            if (shared1)
+            {
+                array = coArray1;
+                for (int i = 0; i < note.Length; i++)
+                {
+                    var coPositions = arrayLinker[exceptions[i]];
+                    exceptions[i] = coPositions[0].ToString() + coPositions[1].ToString();
+                }
+            }
+            else if (shared2)
+            {
+                array = coArray2;
+                for (int i = 0; i < note.Length; i++)
+                {
+                    var coPositions = arrayLinker[exceptions[i]];
+                    exceptions[i] = coPositions[2].ToString() + coPositions[2].ToString();
+                }
+            }
+            else
+                return;
+            for (int i = 0; i < note.Length; i++)
+                EditNotes(note[i], array, exceptions);
         }
         public static void BoardValidator(char[][] sudokuArrays)
         {
@@ -208,83 +228,6 @@ namespace SudokuLibrary
             }
             AddNum(num, array, pos);
         }
-        void NakedPairs(int array) 
-        {
-            for(int i = 0; i < 9; i++)
-            {
-                if (sudokuArrays[array][i] != '\0')
-                    continue;
-                var str = array.ToString() + i.ToString();
-                if (notes[str].Length == 2)
-                {
-                    for(int j = i; j < 9; j++)
-                    {
-                        if (sudokuArrays[array][j] != '\0')
-                            continue;
-                        var str2 = array.ToString() + j.ToString();
-                        if (notes[str] == notes[str2])
-                        {
-                            var exceptions = new string[2] { str, str2 };
-                            EditNotes(notes[str][0], array, exceptions);
-                            EditNotes(notes[str][1], array, exceptions);
-                        }
-                    }
-                }
-            }
-        }
-        void NakedTriplets(int array)
-        {
-
-        }
-        void NakedCandidates(int arrayNum)
-        {
-            var blankCount = 0;
-            var array = sudokuArrays[arrayNum];
-            string note;
-            for (int i = 0; i < 9; i++)
-            {
-                if (array[i] == '\0')
-                    blankCount++;
-                else
-                    continue;
-                var exceptions = new string[9];
-                var count = 0;
-                var str = arrayNum.ToString() + i.ToString();
-                exceptions[i] = str;
-                count++;
-                note = notes[str];
-                for (int j = i + 1; j < 9; j++)
-                {
-                    var similar = false;
-                    if (array[j] != '\0')
-                        continue;
-                    str = arrayNum.ToString() + j.ToString();
-                    foreach (char c in note)
-                    {
-                        if (notes[str].Contains(c))
-                            similar = true;
-                    }
-                    if (!similar)
-                        continue;
-                    foreach (char c in notes[str])
-                    {
-                        if (!note.Contains(c))
-                            note += c;
-                    }
-                    exceptions[j] = str;
-                    count++;
-                    if (note.Length == count)
-                        break;
-                }
-                if (note.Length < blankCount && note.Length == count)
-                {
-                    foreach (char c in note)
-                    {
-                        EditNotes(c, arrayNum, exceptions);
-                    }
-                }
-            }
-        }
         void ScanByBox(char num)
         {
             var array = 0;
@@ -299,6 +242,7 @@ namespace SudokuLibrary
                 for (int j = 0; j < 9; j++)
                 {
                     var str = i.ToString() + j.ToString();
+
                     var coPositions = arrayLinker[str];
                     var row = coPositions[0];
                     if (block[j] == '\0' && notes[str].Contains(num))
@@ -333,15 +277,8 @@ namespace SudokuLibrary
                             exceptions[j] = coPositions[0].ToString() + coPositions[1].ToString();
                         else
                             exceptions[j] = coPositions[2].ToString() + coPositions[3].ToString();
-                    for (int j = 0; j < count; j ++)
-                    {
-                        var coPositions = arrayLinker[openSpots[j]];
-		        if(array < 9)
-			    exceptions[j] = coPositions[0].ToString() + coPositions[1].ToString();
-                        else
-			    exceptions[j] = coPositions[2].ToString() + coPositions[3].ToString();
+                        EditNotes(num, array, exceptions);
                     }
-                    EditNotes(num, array, exceptions);
                 }
             }
         }
@@ -400,7 +337,6 @@ namespace SudokuLibrary
                 valueAdded = false;
                 for (int i = 1; i < 10; i++)
                     ScanByBox(Convert.ToChar(i + '0'));
-                    ScanByNumber(Convert.ToChar(i + '0'));
                 if (valueAdded == false)
                 {
                     for (int i = 0; i < 27; i++)
