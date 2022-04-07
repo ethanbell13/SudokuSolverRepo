@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace SudokuTestLibrary
 {
     [TestClass]
-    public class BoardOrganizerTest
+    public class InitializationTests
     {
         [TestMethod]
         public void NineBy9ArrayIn27By9ArayOut()
